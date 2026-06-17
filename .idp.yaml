@@ -1,0 +1,40 @@
+kind: template
+name: "Kubernetes Helm Service"
+description: "Production-ready Helm chart for any containerised service. Supports EKS, AKS, GKE. Includes HPA, liveness/readiness probes, resource limits, GitHub Actions CD."
+tech_stack: helm
+category: backend
+
+deploy:
+  type: helm
+  path: ./chart
+  pipeline: github-actions
+  entry: deploy.yml
+  branch: main
+
+parameters:
+  - name: service_name
+    label: Service Name / Release Name
+    type: string
+    required: true
+  - name: namespace
+    label: Kubernetes Namespace
+    type: string
+    default: default
+  - name: image_tag
+    label: Image Tag
+    type: string
+    default: latest
+  - name: replicas
+    label: Replica Count
+    type: number
+    default: 1
+  - name: environment
+    label: Environment
+    type: select
+    options: [{ value: dev, label: Dev }, { value: prod, label: Prod }]
+    default: dev
+
+requires:
+  - kind: secret
+    name: KUBECONFIG
+    description: "Base64-encoded kubeconfig for target cluster"
